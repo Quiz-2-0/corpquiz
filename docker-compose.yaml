@@ -26,9 +26,9 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - ./corpquiz/nginx:/etc/nginx/conf.d
       - ./frontend/build:/usr/share/nginx/html/
-      - ./docs/:/usr/share/nginx/html/api/v1/docs/
+      - ./corpquiz/docs/:/usr/share/nginx/html/api/v1/docs/
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
