@@ -1,324 +1,2379 @@
-openapi: 3.0.2
+openapi: 3.0.0
 info:
-  title: ''
-  version: ''
+  title: corporate quiz, спецификация OpenAPI
+  version: 0.0.1
+servers:
+  - url: http://80.87.106.133/api/v1/
+    description: server
 paths:
-  /api/v1/users/me/:
+  /quizes/:
     get:
-      operationId: retrieveCustomUser
-      description: ''
-      parameters: []
+      security:
+        - bearerAuth: []
+      summary: Получение списка незавершенных квизов квизов
+      tags: 
+        - quizes
+      operationId: getAllQuizes
       responses:
         '200':
+          description: Успешный ответ со списком квизов
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserCreate'
-          description: ''
-      tags:
-      - api
-  /api/v1/quizes/:
+                $ref: "#/components/schemas/quizes"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+  /quizes/not_complited/:
     get:
-      operationId: listQuizs
-      description: ''
-      parameters: []
+      security:
+        - bearerAuth: []
+      summary: Получение списка квизов
+      tags: 
+        - quizes
+      operationId: getNotComplitedQuizes
       responses:
         '200':
+          description: Успешный ответ со списком квизов
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Quiz'
-          description: ''
-      tags:
-      - api
-  /api/v1/quizes/{id}/:
+                $ref: "#/components/schemas/quizes"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+  /quizes/{quiz_id}/:
     get:
-      operationId: retrieveQuiz
-      description: ''
-      parameters:
-      - name: id
-        in: path
+      security:
+        - bearerAuth: []
+      summary: Получение квиза по идентификатору
+      tags: 
+        - quizes
+      operationId: getQuizById
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Успешный ответ с квизом по идентификатору
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/quiz"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+  /quizes/{quiz_id}/answer/:
+    post:
+      security:
+        - bearerAuth: []
+      summary: запись ответа пользователя по идентификатору ответа
+      tags: 
+        - quizes
+      operationId: createUserAnswer
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+      requestBody:
         required: true
-        description: ''
-        schema:
-          type: string
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/user_question_create"
+      responses:
+        '201':
+          description: Успешный ответ записи ответа
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+  /quizes/{quiz_id}/statistic/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение статистики по идентификатору квиза
+      tags: 
+        - quizes
+      operationId: getStatisticById
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
       responses:
         '200':
+          description: Успешный ответ со статистикой пользователя по данному квизу
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Quiz'
-          description: ''
-      tags:
-      - api
-  /api/v1/users/token/:
+                $ref: "#/components/schemas/statistics"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+  /users/me/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение данных пользователя
+      tags: 
+        - users
+      operationId: getUserInfo
+      responses:
+        '200':
+          description: Успешный ответ с данными пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/users_me"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+  /users/token/:
     post:
-      operationId: createCustomTokenObtainPair
-      description: 'Takes a set of user credentials and returns an access and refresh
-        JSON web
+      summary: Получение токена для авторизации пользователя
+      tags: 
+        - users
+      operationId: createUserToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/users_token_request"
+      responses:
+        '201':
+          description: Успешный ответ с токеном пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/users_token_response"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+  /users/reset/:
+    post:
+      summary: Сброс пароля пользователя по email
+      tags: 
+        - users
+      operationId: createUserPasswordReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/users_reset"
+      responses:
+        '200':
+          description: Успешная отправка нового пароля пользователя на email
+        '404':
+          $ref: "#/components/responses/NotFound"
+  /users/avatar/:
+    post:
+      summary: Сохранение аватара пользователя
+      tags: 
+        - users
+      operationId: createUserAvatar
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/avatar_create"
+      responses:
+        '201':
+          description: Успешный ответ сохранения аватара пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/avatars_"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение предустановленных аватаров
+      tags: 
+        - users
+      operationId: getPredifinedAvatars
+      responses:
+        '200':
+          description: Успешный ответ с предустановленными аватарами
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/avatars"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+  /users/achivements/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение достижений пользователя
+      tags: 
+        - users
+      operationId: getUserAchivments
+      responses:
+        '200':
+          description: Успешный ответ с достижениями пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/achivments"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+  /users/achivements/short:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение последних достижений пользователя
+      tags: 
+        - users
+      operationId: getUserAchivmentsLast
+      responses:
+        '200':
+          description: Успешный ответ с последними достижениями пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/achivments_short"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+  /users/ratings/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение списка с рейтингами отдела
+      tags: 
+        - users
+      operationId: getUserRating
+      responses:
+        '200':
+          description: Успешный ответ с рейтингом отдела
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ratings"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+  /users/ratings/short:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение лидеров рейтинга
+      tags: 
+        - users
+      operationId: getUserRatingShort
+      responses:
+        '200':
+          description: Успешный ответ с лидерами рейтинга
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ratings_short"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+  /admin/tags/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение списка тегов
+      tags: 
+        - admin_tags
+      operationId: getQuizesTags
+      responses:
+        '200':
+          description: Успешный ответ со списком тегов
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tags"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+    post:
+      security:
+        - bearerAuth: []
+      summary: Создание тега
+      tags: 
+        - admin_tags
+      operationId: createQuizTag
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/create_tag"
+      responses:
+        '201':
+          description: Успешный ответ создания тега
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tag"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"  
+  /admin/tags/{tag_id}/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение тега по идентификатору
+      tags: 
+        - admin_tags
+      parameters: 
+        - name: tag_id
+          in: path
+          required: true
+          description: Идентификатор тега
+          schema:
+            type: integer
+          example: 1
+      operationId: getQuizesTag
+      responses:
+        '200':
+          description: Успешный ответ со списком тегов
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tag"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+    put:
+      security:
+        - bearerAuth: []
+      summary: Обновление тега
+      tags: 
+        - admin_tags
+      parameters: 
+        - name: tag_id
+          in: path
+          required: true
+          description: Идентификатор тега
+          schema:
+            type: integer
+          example: 1
+      operationId: updateQuizTag
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/create_tag"
+      responses:
+        '200':
+          description: Успешный ответ с изменением тега
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tag"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Обновление тега
+      tags: 
+        - admin_tags
+      parameters: 
+        - name: tag_id
+          in: path
+          required: true
+          description: Идентификатор тега
+          schema:
+            type: integer
+          example: 1
+      operationId: updateQuizTagPatrial
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/create_tag"
+      responses:
+        '200':
+          description: Успешный ответ с изменением тега
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tag"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление тега по идентификатору
+      tags: 
+        - admin_tags
+      operationId: deleteQuizTag
+      parameters: 
+        - name: tag_id
+          in: path
+          required: true
+          description: Идентификатор тега
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '204':
+          description: Успешное удаление тэга
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+  /admin/levels/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение списка уровней квиза
+      tags: 
+        - admin_levels
+      operationId: getQuizesLevels
+      responses:
+        '200':
+          description: Успешный ответ со списком уровней
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/levels"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+    post:
+      security:
+        - bearerAuth: []
+      summary: Создание уровня
+      tags: 
+        - admin_levels
+      operationId: createQuizlevel
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/create_level"
+      responses:
+        '201':
+          description: Успешный ответ создания уровня
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/level"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError" 
+  /admin/levels/{level_id}/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение уровня квиза по идентификатору
+      tags: 
+        - admin_levels
+      operationId: getQuizesLevel
+      parameters: 
+        - name: level_id
+          in: path
+          required: true
+          description: Идентификатор уровня
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Успешный ответ с уровнем
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/level"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+    put:
+      security:
+        - bearerAuth: []
+      summary: Обновление уровня
+      tags: 
+        - admin_levels
+      operationId: updateQuizlevel
+      parameters: 
+        - name: level_id
+          in: path
+          required: true
+          description: Идентификатор уровня
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/create_level"
+      responses:
+        '200':
+          description: Успешный изменение уровня квиза
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/level"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Обновление уровня
+      tags: 
+        - admin_levels
+      operationId: updateQuizlevelpatrial
+      parameters: 
+        - name: level_id
+          in: path
+          required: true
+          description: Идентификатор уровня
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/create_level"
+      responses:
+        '200':
+          description: Успешный изменение уровня квиза
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/level"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление уровня по идентификатору
+      tags: 
+        - admin_levels
+      operationId: deleteQuizlevel
+      parameters: 
+        - name: level_id
+          in: path
+          required: true
+          description: Идентификатор уровня
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '204':
+          description: Успешное удаление уровня
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+  /admin/users/departments/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение списка отделов
+      tags: 
+        - admin_departments
+      operationId: getDepartaments
+      responses:
+        '200':
+          description: Успешный ответ со списком отделов
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/departaments"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+    post:
+      security:
+        - bearerAuth: []
+      summary: Создание отдела
+      tags: 
+        - admin_departments
+      operationId: createDepartament
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/create_departament"
+      responses:
+        '201':
+          description: Успешный ответ создания отдела
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/departament"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError" 
+  /admin/users/departments/{department_id}/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение отдела
+      tags: 
+        - admin_departments
+      operationId: getDepartament
+      parameters: 
+        - name: department_id
+          in: path
+          required: true
+          description: Идентификатор отдела
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Успешный ответ с отделом
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/departament"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+    put:
+      security:
+        - bearerAuth: []
+      summary: Обновление отдела
+      tags: 
+        - admin_departments
+      operationId: updateDepartament
+      parameters: 
+        - name: department_id
+          in: path
+          required: true
+          description: Идентификатор отдела
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/create_departament"
+      responses:
+        '200':
+          description: Успешный изменение отдела
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/departament"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Обновление отдела
+      tags: 
+        - admin_departments
+      operationId: updateDepartamentPatrial
+      parameters: 
+        - name: department_id
+          in: path
+          required: true
+          description: Идентификатор отдела
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/create_departament"
+      responses:
+        '200':
+          description: Успешный изменение отдела
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/departament"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
 
-        token pair to prove the authentication of those credentials.'
-      parameters: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CustomTokenObtainPair'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/CustomTokenObtainPair'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/CustomTokenObtainPair'
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление отдела по идентификатору
+      tags: 
+        - admin_departments
+      operationId: deleteDepartament
+      parameters: 
+        - name: department_id
+          in: path
+          required: true
+          description: Идентификатор отдела
+          schema:
+            type: integer
+          example: 1
       responses:
-        '201':
+        '204':
+          description: Успешное удаление отдела
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+  /admin/quizes/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение списка квизов
+      tags: 
+        - admin_quizes
+      operationId: getAdminQuizes
+      responses:
+        '200':
+          description: Успешный ответ со списком квизов
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomTokenObtainPair'
-          description: ''
-      tags:
-      - api
-  /api/v1/users/reset/:
+                $ref: "#/components/schemas/quizes_admin"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
     post:
-      operationId: createCustomUser
-      description: ''
-      parameters: []
+      security:
+        - bearerAuth: []
+      summary: Создание квиза
+      tags: 
+        - admin_quizes
+      operationId: createAdminQuiz
       requestBody:
+        required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/UserResetPassword'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/UserResetPassword'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/UserResetPassword'
+              schema:
+                $ref: "#/components/schemas/quiz_create"
       responses:
         '201':
+          description: Успешный ответ создания отдела
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResetPassword'
-          description: ''
-      tags:
-      - api
-  /api/v1/users/create/:
+                $ref: "#/components/schemas/quiz_admin"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError" 
+  /admin/quizes/assigned_list/:
     post:
-      operationId: createCustomUser
-      description: ''
-      parameters: []
+      security:
+        - bearerAuth: []
+      summary: Создание квиза
+      tags: 
+        - admin_quizes
+      operationId: createAssigned
       requestBody:
+        required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/UserCreate'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/UserCreate'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/UserCreate'
+              schema:
+                $ref: "#/components/schemas/assignet_post"
       responses:
         '201':
+          description: Успешный ответ создания отдела
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError" 
+  /admin/quizes/{quiz_id}/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение квиза
+      tags: 
+        - admin_quizes
+      operationId: getAdminQuiz
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Успешный ответ с квизом
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserCreate'
-          description: ''
-      tags:
-      - api
-  /api/v1/quizes/statistic/:
-    post:
-      operationId: collectStatisticStatisticViewSet
-      description: ''
-      parameters: []
+                $ref: "#/components/schemas/quiz_admin"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+    put:
+      security:
+        - bearerAuth: []
+      summary: Обновление квиза
+      tags: 
+        - admin_quizes
+      operationId: updateAdminQuiz
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор отдела
+          schema:
+            type: integer
+          example: 1
       requestBody:
+        required: true
         content:
           application/json:
-            schema: {}
-          application/x-www-form-urlencoded:
-            schema: {}
-          multipart/form-data:
-            schema: {}
+              schema:
+                $ref: "#/components/schemas/quiz_create"
       responses:
-        '201':
+        '200':
+          description: Успешное изменение квиза
           content:
             application/json:
-              schema: {}
-          description: ''
-      tags:
-      - api
+              schema:
+                $ref: "#/components/schemas/quiz_admin"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Обновление квиза
+      tags: 
+        - admin_quizes
+      operationId: updateAdminQuizPatrial
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/quiz_create"
+      responses:
+        '200':
+          description: Успешное изменение квиза
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/quiz_admin"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление квиза по идентификатору
+      tags: 
+        - admin_quizes
+      operationId: deleteAdminQuiz
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '204':
+          description: Успешное удаление квиза
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+  /admin/quizes/{quiz_id}/questions/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение списка вопросов
+      tags: 
+        - admin_questions
+      operationId: getAdminQuestions
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Успешный ответ со списком вопросов
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/questions_admin"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+    post:
+      security:
+        - bearerAuth: []
+      summary: Создание вопроса
+      tags: 
+        - admin_questions
+      operationId: createAdminQuestions
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/question_create"
+      responses:
+        '201':
+          description: Успешный ответ создания вопроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/question_admin"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+  /admin/quizes/{quiz_id}/questions_list/:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Создание списка вопросов
+      tags: 
+        - admin_questions
+      operationId: createAdminQuestionsList
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/questions_create"
+      responses:
+        '201':
+          description: Успешный ответ создания вопроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/questions_admin"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+  /admin/quizes/{quiz_id}/questions/{question_id}/:
+    put:
+      security:
+        - bearerAuth: []
+      summary: Обновление вопроса
+      tags: 
+        - admin_questions
+      operationId: updateAdmiQnuestion
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор вопроса
+          schema:
+            type: integer
+          example: 1
+        - name: question_id
+          in: path
+          required: true
+          description: Идентификатор вопроса
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/question_create"
+      responses:
+        '200':
+          description: Успешное изменение вопроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/question_admin"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Обновление вопроса
+      tags: 
+        - admin_questions
+      operationId: updateAdminQuestionPatrial
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор вопроса
+          schema:
+            type: integer
+          example: 1
+        - name: question_id
+          in: path
+          required: true
+          description: Идентификатор вопроса
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/question_create"
+      responses:
+        '200':
+          description: Успешное изменение вопроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/question_admin"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление вопроса по идентификатору
+      tags: 
+        - admin_questions
+      operationId: deleteAdminQuestion
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор вопроса
+          schema:
+            type: integer
+          example: 1
+        - name: question_id
+          in: path
+          required: true
+          description: Идентификатор вопроса
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '204':
+          description: Успешное удаление вопроса
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+  /admin/quizes/{quiz_id}/volumes/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение списка материалов
+      tags: 
+        - admin_volumes
+      operationId: getAdminVolumes
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Успешный ответ со списком материалов
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/volumes"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+    post:
+      security:
+        - bearerAuth: []
+      summary: Создание материала
+      tags: 
+        - admin_volumes
+      operationId: createAdminVolume
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/volume_create"
+      responses:
+        '201':
+          description: Успешный ответ создания отдела
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/volume"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+  /admin/quizes/{quiz_id}/volumes/{volume_id}/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение материала
+      tags: 
+        - admin_volumes
+      operationId: getAdminVolume
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+        - name: volume_id
+          in: path
+          required: true
+          description: Идентификатор материала
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Успешный ответ с материалом
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/volume"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+    put:
+      security:
+        - bearerAuth: []
+      summary: Обновление материала
+      tags: 
+        - admin_volumes
+      operationId: updateAdmiVolume
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор квиза
+          schema:
+            type: integer
+          example: 1
+        - name: volume_id
+          in: path
+          required: true
+          description: Идентификатор материала
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/volume_create"
+      responses:
+        '200':
+          description: Успешное изменение материала
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/volume"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Обновление материала
+      tags: 
+        - admin_volumes
+      operationId: updateAdminVolumePatrial
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор вопроса
+          schema:
+            type: integer
+          example: 1
+        - name: volume_id
+          in: path
+          required: true
+          description: Идентификатор материала
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/volume_create"
+      responses:
+        '200':
+          description: Успешное изменение материала
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/volume"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление материала по идентификатору
+      tags: 
+        - admin_volumes
+      operationId: deleteAdminVolume
+      parameters: 
+        - name: quiz_id
+          in: path
+          required: true
+          description: Идентификатор вопроса
+          schema:
+            type: integer
+          example: 1
+        - name: volume_id
+          in: path
+          required: true
+          description: Идентификатор материала
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '204':
+          description: Успешное удаление материала
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+  /admin/users/create/:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Создание пользователя
+      tags: 
+        - admin_users
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/user_create"
+      responses:
+        '201':
+          description: Успешный ответ создания пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"  
+  /admin/users/create/{user_id}/:
+    put:
+      security:
+        - bearerAuth: []
+      summary: Обновление пользователя
+      tags: 
+        - admin_users
+      parameters: 
+        - name: user_id
+          in: path
+          required: true
+          description: Идентификатор пользователя
+          schema:
+            type: integer
+          example: 1
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/user_create"
+      responses:
+        '200':
+          description: Успешный ответ с изменением пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user_create"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Обновление пользователя
+      tags: 
+        - admin_users
+      parameters: 
+        - name: user_id
+          in: path
+          required: true
+          description: Идентификатор пользователя
+          schema:
+            type: integer
+          example: 1
+      operationId: updateUserPatrial
+      requestBody:
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/schemas/user_create"
+      responses:
+        '200':
+          description: Успешный ответ с изменением пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user_create"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '400':
+          $ref: "#/components/responses/ValidationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление пользователя по идентификатору
+      tags: 
+        - admin_users
+      operationId: deleteUser
+      parameters: 
+        - name: user_id
+          in: path
+          required: true
+          description: Идентификатор пользователя
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '204':
+          description: Успешное удаление пользователя
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
+        '404':
+          $ref: "#/components/responses/NotFound"
+  /admin/users/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение списка пользователей
+      tags: 
+        - admin_users
+      operationId: getUsers
+      responses:
+        '200':
+          description: Успешный ответ со списком пользователей
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/users"
+        '401':
+          $ref: "#/components/responses/AuthenticationError" 
+  /admin/users/{user_id}/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение пользователя по идентификатору
+      tags: 
+        - admin_users
+      parameters: 
+        - name: user_id
+          in: path
+          required: true
+          description: Идентификатор тега
+          schema:
+            type: integer
+          example: 1
+      operationId: getUser
+      responses:
+        '200':
+          description: Успешный ответ с пользователем
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
 components:
   schemas:
-    UserCreate:
+    volume_create:
       type: object
       properties:
-        firstName:
+        name:
           type: string
-          maxLength: 150
-        lastName:
+          example: Наименование учебного материала
+        description:
           type: string
-          maxLength: 150
-        position:
-          type: string
-          maxLength: 150
-        role:
-          enum:
-          - AD
-          - EMP
-          type: string
-        patronymic:
-          type: string
-          maxLength: 150
-        department:
-          type: string
-        email:
-          type: string
-          format: email
-          maxLength: 254
-        avatar:
-          type: string
-          format: binary
-        score:
-          type: integer
-          nullable: true
-          description: score
-      required:
-      - firstName
-      - lastName
-      - position
-      - department
-      - email
-      - avatar
-    Quiz:
+          example: Описание учебного материала
+    volume:
       type: object
       properties:
         id:
           type: integer
-          readOnly: true
-        image:
-          type: string
-          format: binary
-        description:
-          type: string
-          maxLength: 240
-        directory:
-          type: string
-          readOnly: true
+          example: 1
         name:
           type: string
-          maxLength: 200
+          example: Наименование учебного материала
+        description:
+          type: string
+          example: Описание учебного материала
+    volumes:
+      type: array
+      items:
+        $ref: "#/components/schemas/volume"
+    departament:
+      type: object
+      required: 
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: Наименование отдела
+    create_departament:
+      type: object
+      required: 
+        - name
+      properties:
+        name:
+          type: string
+          example: Наименование отдела
+    departaments:
+      type: array
+      items:
+            $ref: "#/components/schemas/departament"
+    level:
+      type: object
+      required: 
+        - id
+        - name
+        - description
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: Наименование уровня
+        description:
+          type: string
+          example: Описание уровня
+    create_level:
+      type: object
+      required: 
+        - name
+        - description
+      properties:
+        name:
+          type: string
+          example: Наименование уровня
+        description:
+          type: string
+          example: Описание уровня
+    levels:
+      type: array
+      items:
+            $ref: "#/components/schemas/level"
+    tag:
+      type: object
+      required: 
+        - id
+        - name
+        - color
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: Наименование тега
+        color:
+          type: string
+          example: "#63B9BA"
+    tag_quiz:
+      type: object
+      required: 
+        - id
+      properties:
+        id:
+          type: integer
+    create_tag:
+      type: object
+      required: 
+        - name
+        - color
+      properties:
+        name:
+          type: string
+          example: Наименование тега
+        color:
+          type: string
+          example: "#63B9BA"
+    tags:
+      type: array
+      items:
+            $ref: "#/components/schemas/tag"
+    answers_list:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+          example: ответ пользователя из списка
+    answer_list_create:
+      type: object
+      properties:
+        text:
+          type: string
+          example: ответ пользователя из списка
+    user_answer_list_create:
+      type: object
+      properties:
+        answer_list:
+          type: integer
+    user_answer_create:
+      type: object
+      required:
+        - answer
+      properties:
+        answer:
+          type: integer
+        answer_text :
+          type: string
+          example: ответ пользователя текстом
+        answer_list:
+          type: array
+          items:
+            $ref: "#/components/schemas/user_answer_list_create"
+    answer_create:
+      type: object
+      properties:
+        text:
+          type: string
+          example: ответ пользователя
+        image:
+          type: string
+          example: "http://80.87.106.133/media/answer/image/Pic.png"
+        answers_list:
+          type: array
+          items:
+            $ref: "#/components/schemas/answer_list_create"
+    answer:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+          example: ответ пользователя
+        image:
+          type: string
+          example: "http://80.87.106.133/media/answer/image/Pic.png"
+        answers_list:
+          type: array
+          items:
+            $ref: "#/components/schemas/answers_list"
+    user_question_create:
+      type: object
+      required: 
+        - id
+        - question_type
+        - response_time
+        - answers
+      properties:
+        id:
+          type: integer
+          description: идентификатор вопроса
+        question_type:
+          type: string
+          enum:
+            - ONE
+            - MNY
+            - LST
+            - OPN
+          example: ONE
+        response_time:
+          type: integer
+          description: время ответа в секундах
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/user_answer_create"
+    questions_create:
+      type: array
+      items:
+        $ref: "#/components/schemas/question_create"
+    question_create:
+      type: object
+      properties:
+        question_type :
+          type: string
+          enum:
+            - ONE
+            - MNY
+            - LST
+            - OPN
+          example: ONE
+        text:
+          type: string
+          example: ответ пользователя
+        image:
+          type: string
+          example: "http://80.87.106.133/media/question/image/Pic.png"
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/answer_create"
+    questions_admin:
+      type: array
+      items:
+        $ref: "#/components/schemas/question_admin"
+    question_admin:
+      type: object
+      properties:
+        id:
+          type: integer
+        question_type :
+          type: string
+          enum:
+            - ONE
+            - MNY
+            - LST
+            - OPN
+          example: ONE
+        text:
+          type: string
+          example: ответ пользователя
+        image:
+          type: string
+          example: "http://80.87.106.133/media/question/image/Pic.png"
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/answer"
+    question:
+      type: object
+      properties:
+        id:
+          type: integer
+        question_type :
+          type: string
+          enum:
+            - ONE
+            - MNY
+            - LST
+            - OPN
+          example: ONE
+        text:
+          type: string
+          example: ответ пользователя
+        image:
+          type: string
+          example: "http://80.87.106.133/media/question/image/Pic.png"
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/answer"
+        is_answered:
+          type: boolean
+          example: True
+    quiz_create:
+      type: object
+      properties:
+        image:
+            type: string
+            example: "http://80.87.106.133/media/quizes/image/Pic.png"
+        description:
+          type: string
+          example: Описание квиза
+        directory:
+          type: integer
+          example: 1
+          description: идентификатор подразделения
+        name:
+          type: string
+          example: Наименование квиза
         duration:
           type: integer
+          example: 1
         level:
-          type: string
-          readOnly: true
-        question_amount:
-          type: string
-          readOnly: true
+          type: integer
+          example: 1
+          description: идентификатор уровня квиза
         tags:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: integer
-                readOnly: true
-              name:
-                type: string
-                maxLength: 50
-              color:
-                type: string
-                maxLength: 7
-            required:
-            - name
-          readOnly: true
+            $ref: "#/components/schemas/tag_quiz"
+        threshold:
+          type: integer
+          example: 70
+          description: процент прохождения квиза
+    quiz_admin:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        image:
+            type: string
+            example: "http://80.87.106.133/media/quizes/image/Pic.png"
+        description:
+          type: string
+          example: Описание квиза
+        directory:
+          type: string
+          example: Наименование подразделения
+        name:
+          type: string
+          example: Наименование квиза
+        duration:
+          type: integer
+          example: 1
+        level:
+          type: string
+          example: Наименование уровня квиза
+        question_amount:
+          type: integer
+          example: 1
+        threshold:
+          type: integer
+          example: 70
+          description: процент прохождения квиза
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/tag"
         questions:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: integer
-                readOnly: true
-              image:
-                type: string
-                format: binary
-              text:
-                type: string
-                maxLength: 240
-              answers:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      readOnly: true
-                    text:
-                      type: string
-                      maxLength: 240
-                    image:
-                      type: string
-                      format: binary
-                    isAnswerRight:
-                      type: boolean
-                  required:
-                  - text
-                  - isAnswerRight
-                readOnly: true
-            required:
-            - text
-          readOnly: true
+            $ref: "#/components/schemas/question_admin"
         volumes:
           type: array
           items:
-            type: object
-            properties:
-              name:
-                type: string
-                maxLength: 200
-              description:
-                type: string
-                maxLength: 240
-            required:
-            - name
-            - description
-          readOnly: true
+            $ref: "#/components/schemas/volume"
+    quizes_admin:
+      type: array
+      items:
+        $ref: "#/components/schemas/quiz_admin"
+    quiz:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        image:
+            type: string
+            example: "http://80.87.106.133/media/quizes/image/Pic.png"
+        description:
+          type: string
+          example: Описание квиза
+        directory:
+          type: string
+          example: Наименование подразделения
+        name:
+          type: string
+          example: Наименование квиза
+        duration:
+          type: integer
+          example: 1
+        level:
+          type: string
+          example: Наименование уровня квиза
+        question_amount:
+          type: integer
+          example: 1
+        threshold:
+          type: integer
+          example: 70
+          description: процент прохождения квиза
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/tag"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/question"
+        volumes:
+          type: array
+          items:
+            $ref: "#/components/schemas/volume"
         isPassed:
           type: boolean
+          example: True
         appointed:
           type: boolean
-      required:
-      - description
-      - name
-      - duration
-      - isPassed
-      - appointed
-    CustomTokenObtainPair:
+          example: True
+    quizes:
+      type: array
+      items:
+        $ref: "#/components/schemas/quiz"
+    user_answer:
+      type: object
+      required: 
+        - id
+      properties:
+        id:
+          type: integer
+          example: 1
+          description: идентификатор ответа
+    statistic_answer_list:
       type: object
       properties:
+        text:
+          type: string
+          example: Текст ответа
+        answer_right:
+          type: boolean
+          nullable: true
+          example: True
+    statistic_answer:
+      type: object
+      properties:
+        answer_text:
+          type: string
+          example: Текст ответа
+        answered:
+          type: boolean
+          example: True
+        answer_right:
+          type: boolean
+          nullable: true
+          example: True
+        answer_list:
+          type: array
+          items:
+            $ref: "#/components/schemas/statistic_answer_list"
+    statistic:
+      type: object
+      properties:
+        question_type:
+          type: string
+          enum:
+            - ONE
+            - MNY
+            - LST
+            - OPN
+          example: ONE
+        question:
+          type: string
+          example: Текст вопроса
+        explanation:
+          type: string
+          example: Объяснение ответа
+        answer:
+          type: string
+          example: Правильный ответ текстом
+        user_answer:
+          type: string
+          example: Ответ рользователя текстом
+        is_right:
+          type: boolean
+          description: Вопрос отвечен правильно пользователем
+        answers:
+          type: array
+          items:
+            $ref: "#/components/schemas/statistic_answer"
+    statistics:
+      type: array
+      items:
+        $ref: "#/components/schemas/statistic"
+    user_create:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - patronymic
+        - position
+        - department
+        - email
+        - role
+      properties:
+        firstName:
+          type: string
+          example: Имя пользователя
+          maxLength: 150
+        lastName:
+          type: string
+          example: Фамилия пользователя
+          maxLength: 150
+        position:
+          type: string
+          example: Должность пользователя
+          maxLength: 150
+        patronymic:
+          type: string
+          example: Отчество пользователя
+          maxLength: 150
+        department:
+          type: integer
+          example: 1
+          description: Подразделение пользователя
         email:
           type: string
-        password:
+          example: user@example.com
+        role :
           type: string
-          writeOnly: true
+          enum:
+            - EMP
+            - AD
+          example: EMP
+    users:
+      type: array
+      items:
+        $ref: "#/components/schemas/user"
+    user:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: Имя пользователя
+        lastName:
+          type: string
+          example: Фамилия пользователя
+        position:
+          type: string
+          example: Должность пользователя
+        patronymic:
+          type: string
+          example: Отчество пользователя
+        department:
+          type: string
+          example: Подразделение пользователя
+        email:
+          type: string
+          example: user@example.com
+        assigned:
+          type: integer
+          example: 1
+        count_passed:
+          type: integer
+          example: 1
+        rating:
+          type: integer
+          example: 1
+    users_me:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: Имя пользователя
+        lastName:
+          type: string
+          example: Фамилия пользователя
+        position:
+          type: string
+          example: Должность пользователя
         role:
           type: string
-      required:
-      - email
-      - password
-      - role
-    UserResetPassword:
+          enum:
+            - AD
+            - EMP
+          example: EMP
+        patronymic:
+          type: string
+          example: Отчество пользователя
+        department:
+          type: string
+          example: Подразделение пользователя
+        email:
+          type: string
+          example: user@example.com
+        avatar:
+          type: string
+          example: "/media/user/avatar/Pic.png"
+        pass_progress:
+          type: integer
+          example: 1
+        count_assigned:
+          type: integer
+          example: 1
+        count_passed:
+          type: integer
+          example: 1
+        right_precent:
+          type: integer
+          example: 1
+        level:
+          type: integer
+          example: 1
+        level_description:
+          type: string
+          example: в деревне
+        level_image:
+          type: string
+          example: "http://80.87.106.133/media/user_levels/image/Pic.png"
+        to_next_level:
+          type: integer
+          example: 1
+        in_this_level:
+          type: integer
+          example: 1
+        earned_in_level:
+          type: integer
+          example: 1
+    users_token_request:
       type: object
+      required:
+        - email
+        - password
+        - role
       properties:
         email:
           type: string
-          format: email
-          maxLength: 254
+          example: user@example.com
+        password:
+          type: string
+          example: qwerty
+        role:
+          type: string
+          enum:
+            - AD
+            - EMP
+          example: EMP
+    users_token_response:
+      type: object
+      properties:
+        access:
+          type: string
+          description: access bearer token
+    users_reset:
+      type: object
       required:
-      - email
+        - email
+      properties:
+        email:
+          type: string
+          example: user@example.com
+    achivment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        points_now:
+          type: integer
+          example: 1
+        points_to_get:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: ачивка
+        description:
+          type: string
+          example: описание ачивки
+        image:
+          type: string
+          example: "http://80.87.106.133/media/achivments/image/Pic.png"
+        achived:
+          type: boolean
+          example: True
+    achivments:
+      type: array
+      items:
+        $ref: "#/components/schemas/achivment"
+    achivment_short:
+      type: object
+      properties:
+        name:
+          type: string
+          example: ачивка
+        image:
+          type: string
+          example: "http://80.87.106.133/media/achivments/image/Pic.png"
+    achivments_short:
+      type: array
+      items:
+        $ref: "#/components/schemas/achivment_short"
+    rating:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: firstName
+        lastName:
+          type: string
+          example: lastName
+        avatar:
+          type: string
+          example: "http://80.87.106.133/media/achivments/image/Pic.png"
+        count_passed:
+          type: integer
+          example: 1
+        user_level:
+          type: integer
+          example: 1
+        user_rating:
+          type: integer
+          example: 1
+    ratings:
+      type: array
+      items:
+        $ref: "#/components/schemas/rating"
+    rating_short:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: firstName
+        lastName:
+          type: string
+          example: lastName
+        avatar:
+          type: string
+          example: "http://80.87.106.133/media/achivments/image/Pic.png"
+        user_rating:
+          type: integer
+          example: 1
+    ratings_short:
+      type: array
+      items:
+        $ref: "#/components/schemas/rating_short"
+    avatar:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        avatar:
+          type: string
+          example: http://127.0.0.1:8000/media/predefined_avatars/79190-ed4_wide.jpg
+        description:
+          type: string
+          example: Описание
+    avatars:
+      type: array
+      items:
+        $ref: "#/components/schemas/avatar"
+    avatar_create:
+      type: object
+      properties:
+        avatar:
+          type: string
+          example: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/4Q/
+    avatars_create:
+      type: object
+      items:
+         $ref: "#/components/schemas/avatar_create"
+    avatars_:
+      type: object
+      properties:
+        avatar:
+          type: string
+          example: /media/user/avatar/temp_GDoG2Mj.jpeg
+      items:
+         $ref: "#/components/schemas/avatars_"
+    assigned_user:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+    assigned_quiz:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+    assigned_users:
+      type: array
+      items:
+        $ref: "#/components/schemas/assigned_user"
+    assigned_quizes:
+      type: array
+      items:
+        $ref: "#/components/schemas/assigned_quiz"
+    assignet_post:
+      type: object
+      properties:
+        users:
+          $ref: "#/components/schemas/assigned_users"
+        quizes:
+          $ref: "#/components/schemas/assigned_quizes"
+          
+    SelfMadeError:
+      description: Ошибка
+      type: object
+      properties:
+        errors:
+          description: 'Описание ошибки'
+          type: string
+    
+    ValidationError:
+      description: Стандартные ошибки валидации DRF
+      type: object
+      properties:
+        field_name:
+          description: 'Название поля, в котором произошли ошибки. Таких полей может быть несколько'
+          example: [ 'Обязательное поле.' ]
+          type: array
+          items:
+            type: string
+
+    AuthenticationError:
+      description: Пользователь не авторизован
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "Учетные данные не были предоставлены."
+          type: string
+
+    PermissionDenied:
+      description: Недостаточно прав
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "У вас недостаточно прав для выполнения данного действия."
+          type: string
+    NotFound:
+      description: Объект не найден
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "Страница не найдена."
+          type: string
+          
+  responses:
+    ValidationError:
+      description: 'Ошибки валидации в стандартном формате DRF'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+
+    AuthenticationError:
+      description: Пользователь не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticationError'
+
+    PermissionDenied:
+      description: Недостаточно прав
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PermissionDenied'
+
+    NotFound:
+      description: Объект не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFound'
+
+  securitySchemes:
+    bearerAuth:       
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  
+  

@@ -10,8 +10,7 @@ services:
       - ./.env
 
   backend:
-    build:
-      context: ./backend
+    image: bigfut/corpquiz-backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
@@ -36,8 +35,7 @@ services:
       - backend
 
   frontend:
-    build:
-      context: ./frontend
+    image: bigfut/corpquiz-frontend:latest
     volumes:
       - ./frontend/:/app/result_build/
     depends_on:
