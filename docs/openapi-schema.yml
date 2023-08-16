@@ -10,27 +10,10 @@ paths:
     get:
       security:
         - bearerAuth: []
-      summary: Получение списка незавершенных квизов квизов
-      tags: 
-        - quizes
-      operationId: getAllQuizes
-      responses:
-        '200':
-          description: Успешный ответ со списком квизов
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/quizes"
-        '401':
-          $ref: "#/components/responses/AuthenticationError"
-  /quizes/not_complited/:
-    get:
-      security:
-        - bearerAuth: []
       summary: Получение списка квизов
       tags: 
         - quizes
-      operationId: getNotComplitedQuizes
+      operationId: getAllQuizes
       responses:
         '200':
           description: Успешный ответ со списком квизов
@@ -51,7 +34,7 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
@@ -76,13 +59,13 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -105,7 +88,7 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
@@ -143,7 +126,6 @@ paths:
         - users
       operationId: createUserToken
       requestBody:
-        required: true
         content:
           application/json:
               schema:
@@ -166,7 +148,6 @@ paths:
         - users
       operationId: createUserPasswordReset
       requestBody:
-        required: true
         content:
           application/json:
               schema:
@@ -332,7 +313,7 @@ paths:
       parameters: 
         - name: tag_id
           in: path
-          required: true
+          required: True
           description: Идентификатор тега
           schema:
             type: integer
@@ -356,7 +337,7 @@ paths:
       parameters: 
         - name: tag_id
           in: path
-          required: true
+          required: True
           description: Идентификатор тега
           schema:
             type: integer
@@ -390,7 +371,7 @@ paths:
       parameters: 
         - name: tag_id
           in: path
-          required: true
+          required: True
           description: Идентификатор тега
           schema:
             type: integer
@@ -425,7 +406,7 @@ paths:
       parameters: 
         - name: tag_id
           in: path
-          required: true
+          required: True
           description: Идентификатор тега
           schema:
             type: integer
@@ -488,7 +469,7 @@ paths:
       parameters: 
         - name: level_id
           in: path
-          required: true
+          required: True
           description: Идентификатор уровня
           schema:
             type: integer
@@ -512,7 +493,7 @@ paths:
       parameters: 
         - name: level_id
           in: path
-          required: true
+          required: True
           description: Идентификатор уровня
           schema:
             type: integer
@@ -541,11 +522,11 @@ paths:
       summary: Обновление уровня
       tags: 
         - admin_levels
-      operationId: updateQuizlevelpatrial
+      operationId: updateQuizlevel
       parameters: 
         - name: level_id
           in: path
-          required: true
+          required: True
           description: Идентификатор уровня
           schema:
             type: integer
@@ -578,7 +559,7 @@ paths:
       parameters: 
         - name: level_id
           in: path
-          required: true
+          required: True
           description: Идентификатор уровня
           schema:
             type: integer
@@ -615,7 +596,7 @@ paths:
         - admin_departments
       operationId: createDepartament
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -642,7 +623,7 @@ paths:
       parameters: 
         - name: department_id
           in: path
-          required: true
+          required: True
           description: Идентификатор отдела
           schema:
             type: integer
@@ -666,13 +647,13 @@ paths:
       parameters: 
         - name: department_id
           in: path
-          required: true
+          required: True
           description: Идентификатор отдела
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -700,13 +681,13 @@ paths:
       parameters: 
         - name: department_id
           in: path
-          required: true
+          required: True
           description: Идентификатор отдела
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -735,7 +716,7 @@ paths:
       parameters: 
         - name: department_id
           in: path
-          required: true
+          required: True
           description: Идентификатор отдела
           schema:
             type: integer
@@ -772,7 +753,7 @@ paths:
         - admin_quizes
       operationId: createAdminQuiz
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -788,6 +769,23 @@ paths:
           $ref: "#/components/responses/AuthenticationError"
         '400':
           $ref: "#/components/responses/ValidationError" 
+  /admin/quizes/images/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение списка изображений квиза
+      tags: 
+        - admin_quizes
+      operationId: getAdminQuizesImages
+      responses:
+        '200':
+          description: Успешный ответ со изображений квиза
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/quiz_images"
+        '401':
+          $ref: "#/components/responses/AuthenticationError"
   /admin/quizes/assigned_list/:
     post:
       security:
@@ -797,7 +795,7 @@ paths:
         - admin_quizes
       operationId: createAssigned
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -820,7 +818,7 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
@@ -844,13 +842,13 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор отдела
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -878,13 +876,13 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -913,7 +911,7 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
@@ -936,7 +934,7 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
@@ -960,13 +958,13 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -993,13 +991,13 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -1026,20 +1024,20 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор вопроса
           schema:
             type: integer
           example: 1
         - name: question_id
           in: path
-          required: true
+          required: True
           description: Идентификатор вопроса
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -1067,20 +1065,20 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор вопроса
           schema:
             type: integer
           example: 1
         - name: question_id
           in: path
-          required: true
+          required: True
           description: Идентификатор вопроса
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -1109,14 +1107,14 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор вопроса
           schema:
             type: integer
           example: 1
         - name: question_id
           in: path
-          required: true
+          required: True
           description: Идентификатор вопроса
           schema:
             type: integer
@@ -1139,7 +1137,7 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
@@ -1163,13 +1161,13 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -1196,14 +1194,14 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
           example: 1
         - name: volume_id
           in: path
-          required: true
+          required: True
           description: Идентификатор материала
           schema:
             type: integer
@@ -1227,20 +1225,20 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор квиза
           schema:
             type: integer
           example: 1
         - name: volume_id
           in: path
-          required: true
+          required: True
           description: Идентификатор материала
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -1268,20 +1266,20 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор вопроса
           schema:
             type: integer
           example: 1
         - name: volume_id
           in: path
-          required: true
+          required: True
           description: Идентификатор материала
           schema:
             type: integer
           example: 1
       requestBody:
-        required: true
+        required: True
         content:
           application/json:
               schema:
@@ -1309,14 +1307,14 @@ paths:
       parameters: 
         - name: quiz_id
           in: path
-          required: true
+          required: True
           description: Идентификатор вопроса
           schema:
             type: integer
           example: 1
         - name: volume_id
           in: path
-          required: true
+          required: True
           description: Идентификатор материала
           schema:
             type: integer
@@ -1337,7 +1335,6 @@ paths:
         - admin_users
       operationId: createUser
       requestBody:
-        required: true
         content:
           application/json:
               schema:
@@ -1363,7 +1360,7 @@ paths:
       parameters: 
         - name: user_id
           in: path
-          required: true
+          required: True
           description: Идентификатор пользователя
           schema:
             type: integer
@@ -1397,7 +1394,7 @@ paths:
       parameters: 
         - name: user_id
           in: path
-          required: true
+          required: True
           description: Идентификатор пользователя
           schema:
             type: integer
@@ -1432,7 +1429,7 @@ paths:
       parameters: 
         - name: user_id
           in: path
-          required: true
+          required: True
           description: Идентификатор пользователя
           schema:
             type: integer
@@ -1460,6 +1457,23 @@ paths:
               schema:
                 $ref: "#/components/schemas/users"
         '401':
+          $ref: "#/components/responses/AuthenticationError"
+  /admin/users/me:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение информации об админе
+      tags: 
+        - admin_users
+      operationId: getAdminMe
+      responses:
+        '200':
+          description: Успешный ответ с данными админа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/admin_me"
+        '401':
           $ref: "#/components/responses/AuthenticationError" 
   /admin/users/{user_id}/:
     get:
@@ -1471,7 +1485,7 @@ paths:
       parameters: 
         - name: user_id
           in: path
-          required: true
+          required: True
           description: Идентификатор тега
           schema:
             type: integer
@@ -1626,8 +1640,6 @@ components:
           type: integer
     user_answer_create:
       type: object
-      required:
-        - answer
       properties:
         answer:
           type: integer
@@ -1668,11 +1680,6 @@ components:
             $ref: "#/components/schemas/answers_list"
     user_question_create:
       type: object
-      required: 
-        - id
-        - question_type
-        - response_time
-        - answers
       properties:
         id:
           type: integer
@@ -2111,12 +2118,29 @@ components:
         earned_in_level:
           type: integer
           example: 1
+    admin_me:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: Имя пользователя
+        lastName:
+          type: string
+          example: Фамилия пользователя
+        position:
+          type: string
+          example: Должность пользователя
+        email:
+          type: string
+          example: user@example.com
+        avatar:
+          type: string
+          example: "/media/user/avatar/Pic.png"
     users_token_request:
       type: object
-      required:
-        - email
-        - password
-        - role
       properties:
         email:
           type: string
@@ -2138,8 +2162,6 @@ components:
           description: access bearer token
     users_reset:
       type: object
-      required:
-        - email
       properties:
         email:
           type: string
@@ -2296,6 +2318,22 @@ components:
           $ref: "#/components/schemas/assigned_users"
         quizes:
           $ref: "#/components/schemas/assigned_quizes"
+    quiz_image:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        image:
+          type: string
+          example: http://127.0.0.1:8000/media/quizes/default/wide.jpg
+        description:
+          type: string
+          example: Описание
+    quiz_images:
+      type: array
+      items:
+        $ref: "#/components/schemas/quiz_image"
           
     SelfMadeError:
       description: Ошибка
