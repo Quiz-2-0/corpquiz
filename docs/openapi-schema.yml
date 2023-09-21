@@ -3,7 +3,7 @@ info:
   title: corporate quiz, спецификация OpenAPI
   version: 0.0.1
 servers:
-  - url: http://80.87.106.133/api/v1/
+  - url: https://185.84.162.248/api/v1/
     description: server
 paths:
   /quizes/:
