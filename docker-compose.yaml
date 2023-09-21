@@ -37,8 +37,6 @@ services:
       - ./certbot/www:/var/www/certbot:ro
       - static_value:/var/html/static/
       - media_value:/var/html/media/
-    depends_on:
-      - backend
 
   certbot:
       image: certbot/certbot
