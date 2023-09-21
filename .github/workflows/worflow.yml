@@ -21,6 +21,3 @@ jobs:
           cd corpquiz
           git pull
           cp docker-compose.yaml ../docker-compose.yaml
-          cd ..
-          sudo docker-compose stop
-          sudo docker-compose up -d

@@ -33,19 +33,22 @@ services:
       - ./corpquiz/nginx:/etc/nginx/conf.d
       - ./frontend/build:/usr/share/nginx/html/
       - ./corpquiz/docs/:/usr/share/nginx/html/api/v1/docs/
-      - ./certbot/www:/var/www/certbot/:ro
-      - ./certbot/conf/:/etc/nginx/ssl/:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
       - backend
 
   certbot:
-    container_name: certbot
-    image: certbot/certbot
-    volumes:
-      - ./certbot/www/:/var/www/certbot/:rw
-      - ./certbot/conf/:/etc/letsencrypt/:rw
+      image: certbot/certbot
+      container_name: certbot
+      volumes:
+          - ./certbot/conf:/etc/letsencrypt:rw
+          - ./certbot/www:/var/www/certbot:rw
+      command: certonly --webroot --webroot-path=/var/www/certbot/ --email bigftt@gmail.com --agree-tos --no-eff-email -d corpquiz.zapto.org
+      depends_on:
+        - nginx
 
   # frontend:
   #   container_name: frontend
